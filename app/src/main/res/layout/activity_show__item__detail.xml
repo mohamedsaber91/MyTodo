@@ -6,25 +6,45 @@
     android:layout_height="match_parent"
     tools:context=".Show_Item_Detail">
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/define_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/title"
+        android:textSize="28sp"
+        android:padding="12dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="20dp"/>
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/define_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/define_title"
         android:id="@+id/detail_title"
         tools:text="@string/title"
         android:textColor="@color/colorAccent"
         android:textSize="24sp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="12dp"
         android:padding="8dp"/>
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/define_content"
+        app:layout_constraintTop_toBottomOf="@id/define_title"
+        app:layout_constraintStart_toStartOf="@id/define_title"
+        app:layout_constraintEnd_toStartOf="@id/detail_content"
+        android:text="@string/content"
+        android:textSize="28sp"
+        />
+    <TextView
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/detail_content"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/define_content"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/detail_title"
+        app:layout_constraintTop_toTopOf="@id/define_content"
         tools:text="@string/content"
         android:lines="5"
         android:padding="8dp"
@@ -33,11 +53,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/detail_date"
+        android:gravity="end"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/detail_content"
         tools:text="@string/tododate"
         android:padding="8dp"
-        android:layout_marginStart="10dp"/>
+        android:layout_marginEnd="80dp"/>
 
 </android.support.constraint.ConstraintLayout>
