@@ -15,6 +15,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.mytodo.Adapters.TodoAdapter;
+import com.example.mytodo.AnotherThreads.DeleteAlltodosThread;
+import com.example.mytodo.AnotherThreads.DeleteTodoThread;
+import com.example.mytodo.AnotherThreads.ShowAllTodosThread;
 import com.example.mytodo.Base.BaseActivity;
 import com.example.mytodo.MyDataBase.MyDataBaseManger;
 import com.example.mytodo.MyDataBase.TodoModel;
@@ -77,8 +80,8 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            MyDataBaseManger.getInstance(activity)
-                    .todoDao().deleteAll();
+
+            deleteAll();
             finish();
             startActivity(new Intent(activity,AddTodo.class));
         }
@@ -86,13 +89,29 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-       List<TodoModel> todoModels = MyDataBaseManger.getInstance(activity)
-                .todoDao().showAllTodos();
-       adapter.onDataChanged(todoModels);
+    private void deleteAll() {
+        DeleteAlltodosThread datt = new DeleteAlltodosThread();
+        datt.start();
     }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                ShowAllTodosThread satt = new ShowAllTodosThread(new ShowAllTodosThread.OnPreperedShowingTodosListener() {
+                    @Override
+                    public void onShowTodo(List<TodoModel> todoModels) {
+                        adapter.onDataChanged(todoModels);
+                    }
+                });
+                satt.start();
+            }
+        });
+    }
+
     ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
@@ -101,8 +120,11 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-            MyDataBaseManger.getInstance(activity)
-                    .todoDao().deleteTodo(adapter.getTodoAt(viewHolder.getAdapterPosition()));
+            //delete thread
+            TodoModel model = adapter.getTodoAt(viewHolder.getAdapterPosition());
+            DeleteTodoThread dtt = new DeleteTodoThread(model);
+            dtt.start();
+
 
         }
     };

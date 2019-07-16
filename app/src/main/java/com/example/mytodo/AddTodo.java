@@ -1,5 +1,6 @@
 package com.example.mytodo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -8,6 +9,7 @@ import android.widget.Button;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.example.mytodo.AnotherThreads.InsertTodoThread;
 import com.example.mytodo.Base.BaseActivity;
 import com.example.mytodo.MyDataBase.MyDataBaseManger;
 import com.example.mytodo.MyDataBase.TodoModel;
@@ -42,6 +44,7 @@ public class AddTodo extends BaseActivity implements View.OnClickListener {
         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
             dialog.dismiss();
             finish();
+            startActivity(new Intent(activity,MainActivity.class));
         }
     };
 
@@ -72,9 +75,9 @@ public class AddTodo extends BaseActivity implements View.OnClickListener {
         tdoDate.setError(null);
 
        TodoModel todo =  new TodoModel(title,content,date);
-
-        MyDataBaseManger.getInstance(activity)
-                .todoDao().insertTodo(todo);
+                //add thread
+        InsertTodoThread itt = new InsertTodoThread(todo);
+        itt.start();
 
         showConfirmationMessage(R.string.success,
                 R.string.new_todo_added,
@@ -82,24 +85,7 @@ public class AddTodo extends BaseActivity implements View.OnClickListener {
                 singleButtonCallback);
     }
 
-    private void getDateFromUser() {
 
-
-
-
-    }
-
-    private void getContentFromUser() {
-
-
-
-    }
-
-    private void getTitleFromUser() {
-
-
-
-    }
 
     private void initView() {
         tdoTitle = (TextInputLayout) findViewById(R.id.tdo_title);

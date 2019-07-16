@@ -11,7 +11,7 @@ public abstract class MyDataBaseManger extends RoomDatabase {
     public abstract TodoDao todoDao();
     private static final String TODODATABASE = "todo data base";
 
-    public static MyDataBaseManger getInstance(Context context){
+    public static MyDataBaseManger init(Context context){
         if (myDataBaseManger == null){
               myDataBaseManger = Room.databaseBuilder(context,
                       MyDataBaseManger.class,TODODATABASE)
@@ -20,6 +20,10 @@ public abstract class MyDataBaseManger extends RoomDatabase {
                       .build();
         }
 
+        return myDataBaseManger;
+    }
+
+    public static MyDataBaseManger getInstance(){
         return myDataBaseManger;
     }
 }
