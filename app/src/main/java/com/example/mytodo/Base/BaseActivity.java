@@ -48,6 +48,25 @@ public class BaseActivity extends AppCompatActivity {
         return dialog;
     }
 
+    public MaterialDialog showConfirmationMessage(int titleResId,
+                                                  int contentResId,
+                                                  int posTextResId,
+                                                  MaterialDialog.SingleButtonCallback onPos,
+                                                  int negText,
+                                                  MaterialDialog.SingleButtonCallback onNeg
+    ){
+        dialog= new MaterialDialog.Builder(this)
+                .title(titleResId)
+                .content(contentResId)
+                .positiveText(posTextResId)
+                .onPositive(onPos)
+                .negativeText(negText)
+                .onNegative(onNeg)
+                .cancelable(false)
+                .show();
+        return dialog;
+    }
+
     public MaterialDialog showProgressBar(int titleResId, int contentResId){
         dialog= new MaterialDialog.Builder(this)
                 .title(titleResId)

@@ -6,10 +6,6 @@ import android.widget.TextView;
 
 import com.example.mytodo.Base.BaseActivity;
 
-import static com.example.mytodo.MainActivity.DCONTENT;
-import static com.example.mytodo.MainActivity.DTITLE;
-import static com.example.mytodo.MainActivity.DTODODATE;
-
 public class Show_Item_Detail extends BaseActivity {
 
     protected TextView detailTitle;
@@ -26,15 +22,21 @@ public class Show_Item_Detail extends BaseActivity {
     }
 
     private void onShowDetail() {
-        Intent intent = getIntent();
-        detailTitle.setText(intent.getStringExtra(DTITLE));
-        detailContent.setText(intent.getStringExtra(DCONTENT));
-        detailDate.setText(intent.getStringExtra(DTODODATE));
+           detailTitle.setText(DataHolderForTodo.currentTodo.getTitle());
+           detailContent.setText(DataHolderForTodo.currentTodo.getContent());
+           detailDate.setText(DataHolderForTodo.currentTodo.getTododate());
     }
 
     private void initView() {
-        detailTitle = (TextView) findViewById(R.id.detail_title);
-        detailContent = (TextView) findViewById(R.id.detail_content);
-        detailDate = (TextView) findViewById(R.id.detail_date);
+        detailTitle =  findViewById(R.id.detail_title);
+        detailContent =  findViewById(R.id.detail_content);
+        detailDate =  findViewById(R.id.detail_date);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+        startActivity(new Intent(activity,MainActivity.class));
     }
 }

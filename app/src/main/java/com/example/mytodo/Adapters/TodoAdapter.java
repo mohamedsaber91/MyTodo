@@ -50,11 +50,20 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.ViewHolder> {
 
     public void onDataChanged(List<TodoModel> todos){
         this.list = todos;
-        notifyDataSetChanged();
     }
 
     public TodoModel getTodoAt(int pos){
        return this.list.get(pos);
+    }
+
+    public void deleteallTodos(){
+        list.clear();
+        notifyDataSetChanged();
+    }
+
+    public void removeTodo(int pos){
+        list.remove(pos);
+        notifyItemRemoved(pos);
     }
 
     @Override

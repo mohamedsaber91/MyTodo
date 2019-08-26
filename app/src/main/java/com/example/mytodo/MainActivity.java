@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.mytodo.Adapters.TodoAdapter;
 import com.example.mytodo.AnotherThreads.DeleteAlltodosThread;
 import com.example.mytodo.AnotherThreads.DeleteTodoThread;
@@ -29,39 +31,69 @@ public class MainActivity extends BaseActivity {
     protected RecyclerView recyclerView;
     protected TodoAdapter adapter;
     protected RecyclerView.LayoutManager layoutManager;
-    protected static final String DTITLE = "title";
-    protected static final String DCONTENT = "content";
-    protected static final String DTODODATE = "tododate";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init();
+        setRecyclerView();
+
+          new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
+              @Override
+              public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+                  return false;
+              }
+
+              @Override
+              public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                  final int pos = viewHolder.getAdapterPosition();
+
+                  showConfirmationMessage(R.string.confirm, R.string.delete, R.string.yes,
+                          new MaterialDialog.SingleButtonCallback() {
+                              @Override
+                              public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                  TodoModel model = adapter.getTodoAt(pos);
+                                  DeleteTodoThread dtt = new DeleteTodoThread(model);
+                                  dtt.start();
+                                  adapter.removeTodo(pos);
+
+
+                              }
+                          }, R.string.no, new MaterialDialog.SingleButtonCallback() {
+                              @Override
+                              public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                  dialog.dismiss();
+                                  adapter.notifyItemChanged(pos);
+                              }
+                          });
+              }
+          }).attachToRecyclerView(recyclerView);
+
+
+    }
+
+    private void init() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(activity, AddTodo.class));
+                finish();
+            }
+        });
+
+    }
+
+    private void setRecyclerView() {
         recyclerView = findViewById(R.id.todo_recyclerview);
         adapter = new TodoAdapter(null);
         layoutManager = new LinearLayoutManager(activity);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(layoutManager);
-
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Add new Todo", Snackbar.LENGTH_LONG)
-                        .setAction("Add", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                startActivity(new Intent(activity, AddTodo.class));
-                            }
-                        }).show();
-            }
-        });
-
-        new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
-        adapter.setItemClickListener(clickListener);
     }
 
     @Override
@@ -80,10 +112,19 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+          showConfirmationMessage(R.string.confirm, R.string.delete_all_todos, R.string.yes,
+                  new MaterialDialog.SingleButtonCallback() {
+                      @Override
+                      public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                          deleteAll();
+                      }
+                  }, R.string.no, new MaterialDialog.SingleButtonCallback() {
+                      @Override
+                      public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                          dialog.dismiss();
+                      }
+                  });
 
-            deleteAll();
-            finish();
-            startActivity(new Intent(activity,AddTodo.class));
         }
 
         return super.onOptionsItemSelected(item);
@@ -92,6 +133,7 @@ public class MainActivity extends BaseActivity {
     private void deleteAll() {
         DeleteAlltodosThread datt = new DeleteAlltodosThread();
         datt.start();
+        adapter.deleteallTodos();
     }
 
 
@@ -105,6 +147,13 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onShowTodo(List<TodoModel> todoModels) {
                         adapter.onDataChanged(todoModels);
+                        adapter.setItemClickListener(new TodoAdapter.onItemClickListener() {
+                            @Override
+                            public void onItemClick(TodoModel model) {
+                                DataHolderForTodo.currentTodo=model;
+                                startActivity(new Intent(activity,Show_Item_Detail.class));
+                            }
+                        });
                     }
                 });
                 satt.start();
@@ -112,31 +161,9 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-            //delete thread
-            TodoModel model = adapter.getTodoAt(viewHolder.getAdapterPosition());
-            DeleteTodoThread dtt = new DeleteTodoThread(model);
-            dtt.start();
-
-
-        }
-    };
-
-    TodoAdapter.onItemClickListener clickListener = new TodoAdapter.onItemClickListener() {
-        @Override
-        public void onItemClick(TodoModel model) {
-            Intent intent = new Intent(activity, Show_Item_Detail.class);
-            intent.putExtra(DTITLE, model.getTitle());
-            intent.putExtra(DCONTENT, model.getContent());
-            intent.putExtra(DTODODATE, model.getTododate());
-            startActivity(intent);
-        }
-    };
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

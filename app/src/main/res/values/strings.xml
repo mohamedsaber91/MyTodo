@@ -10,4 +10,9 @@
     <string name="ok">OK</string>
     <string name="add">Add</string>
     <string name="delete_all">Delete All</string>
+    <string name="confirm">confirm</string>
+    <string name="delete_all_todos">Are you want to delete all todos</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete">Are you want to delete this todo</string>
 </resources>
